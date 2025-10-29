@@ -80,7 +80,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 			<SidebarContent>
 				<SidebarGroup>
 					<SidebarMenu className="gap-2">
-						{user?.role === "user"
+						{user?.role === "admin"
 							? data.navMain.admin.map((item) => (
 									<SidebarMenuItem key={item.title}>
 										<SidebarMenuButton tooltip={item.title} isActive={pathname === item.url} asChild>
