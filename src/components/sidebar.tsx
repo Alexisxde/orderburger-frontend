@@ -21,7 +21,7 @@ import {
 import { useAuth } from "@/hooks/use-auth"
 import { getProfile } from "@/services/auth"
 import { useQuery } from "@tanstack/react-query"
-import { ChartSpline, GalleryVerticalEnd, Hamburger, LayoutDashboard, LogOut, PenLine, Wallet } from "lucide-react"
+import { ChartSpline, GalleryVerticalEnd, Hamburger, LayoutDashboard, LogOut, PenLine } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import type * as React from "react"

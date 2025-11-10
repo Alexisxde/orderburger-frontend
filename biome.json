@@ -32,6 +32,7 @@
 				"noAssignInExpressions": "off",
 				"noDocumentCookie": "off"
 			},
+			"correctness": { "useParseIntRadix": "off" },
 			"complexity": { "noBannedTypes": "off", "noUselessLoneBlockStatements": "off", "noAdjacentSpacesInRegex": "off" },
 			"style": { "noNamespace": "error" }
 		},
