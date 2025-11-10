@@ -21,15 +21,7 @@ import {
 import { useAuth } from "@/hooks/use-auth"
 import { getProfile } from "@/services/auth"
 import { useQuery } from "@tanstack/react-query"
-import {
-	BadgeDollarSign,
-	ChartSpline,
-	GalleryVerticalEnd,
-	Hamburger,
-	LayoutDashboard,
-	LogOut,
-	Wallet
-} from "lucide-react"
+import { ChartSpline, GalleryVerticalEnd, Hamburger, LayoutDashboard, LogOut, PenLine, Wallet } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import type * as React from "react"
@@ -38,11 +30,10 @@ const data = {
 	navMain: {
 		user: [
 			{ title: "Informes", url: "/app", icon: ChartSpline },
-			{ title: "Ventas", url: "/app/sales", icon: BadgeDollarSign },
-			{ title: "Catalogo", url: "/app/menu", icon: Hamburger },
-			{ title: "Billeteras", url: "/app/wallets", icon: Wallet }
+			{ title: "Pedidos", url: "/app/orders", icon: PenLine },
+			{ title: "Catalogo", url: "/app/menu", icon: Hamburger }
 		],
-		admin: [{ title: "Dashboard", url: "app/admin/dashboard", icon: LayoutDashboard }]
+		admin: [{ title: "Dashboard", url: "/app/admin/dashboard", icon: LayoutDashboard }]
 	}
 }
 
