@@ -2,35 +2,40 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
+import { useReportMonth } from "@/hooks/use-reports"
 import { MONTH } from "@/lib/utils"
-import { getReportMonth } from "@/services/reports"
-import { useQuery } from "@tanstack/react-query"
-import { ChartNoAxesCombined } from "lucide-react"
+import { ChartNoAxesCombined, Loader2, RotateCcw } from "lucide-react"
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
+import { Button } from "../ui/button"
 
 const chartConfig = {
 	desktop: { label: "Pedidos", color: "var(--chart-1)" }
 } satisfies ChartConfig
 
 export default function ChartAreaOrderMonth() {
-	const { data } = useQuery({
-		queryKey: ["report-month"],
-		queryFn: getReportMonth,
-		staleTime: 1000 * 60 * 5,
-		refetchOnWindowFocus: false,
-		retry: false
-	})
+	const { data, isLoading, refetch, isRefetching } = useReportMonth()
 
 	const chartData = data?.data?.map(({ month, count }) => ({ month: MONTH[parseInt(month) - 1], desktop: count }))
 
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle>Estadísticas</CardTitle>
+				<CardTitle className="text-2xl flex items-center justify-between">
+					<span>Estadísticas</span>
+					<Button variant="ghost" onClick={async () => await refetch()}>
+						{isRefetching ? <Loader2 className="animate-spin" /> : <RotateCcw className="scale-x-[-1]" />}
+					</Button>
+				</CardTitle>
 				<CardDescription className="text-xs">Resumen de los pedidos realizados en los ultimos 6 meses.</CardDescription>
 			</CardHeader>
 			<CardContent>
-				{chartData && chartData.length > 1 ? (
+				{isLoading ||
+					(isRefetching && (
+						<div className="flex h-[150px] items-center justify-center">
+							<Loader2 className="animate-spin" />
+						</div>
+					))}
+				{chartData && !isLoading && !isRefetching && (
 					<ChartContainer config={chartConfig}>
 						<AreaChart accessibilityLayer data={chartData} margin={{ left: 12, right: 12 }}>
 							<CartesianGrid vertical={false} />
@@ -51,7 +56,8 @@ export default function ChartAreaOrderMonth() {
 							/>
 						</AreaChart>
 					</ChartContainer>
-				) : (
+				)}
+				{chartData?.length === 0 && !isLoading && !isRefetching && (
 					<Empty>
 						<EmptyHeader>
 							<EmptyMedia variant="icon">
