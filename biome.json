@@ -22,9 +22,8 @@
 		"enabled": true,
 		"rules": {
 			"recommended": true,
-			"a11y": {
-				"useSemanticElements": "off"
-			},
+			"performance": { "noImgElement": "off" },
+			"a11y": { "useSemanticElements": "off", "noStaticElementInteractions": "off" },
 			"suspicious": {
 				"noArrayIndexKey": "off",
 				"noUnknownAtRules": "off",
