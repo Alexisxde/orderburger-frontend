@@ -19,9 +19,8 @@ import {
 	useSidebar
 } from "@/components/ui/sidebar"
 import { useAuth } from "@/hooks/use-auth"
-import { getProfile } from "@/services/auth"
-import { useQuery } from "@tanstack/react-query"
 import { ChartSpline, GalleryVerticalEnd, Hamburger, LayoutDashboard, LogOut, PenLine } from "lucide-react"
+import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import type * as React from "react"
@@ -38,14 +37,7 @@ const data = {
 }
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-	const { data: user } = useQuery({
-		queryKey: ["user"],
-		queryFn: getProfile,
-		staleTime: 1000 * 60 * 5,
-		refetchOnWindowFocus: false,
-		retry: false
-	})
-	const { logout } = useAuth()
+	const { user, logout } = useAuth()
 	const { isMobile } = useSidebar()
 	const pathname = usePathname()
 
@@ -103,10 +95,13 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 								<SidebarMenuButton
 									size="lg"
 									className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground">
-									{/* <Avatar className="h-8 w-8 rounded-lg">
-										<AvatarImage src={user.avatar} alt={user.name} />
-										<AvatarFallback className="rounded-lg">CN</AvatarFallback>
-									</Avatar> */}
+									<Image
+										width="8"
+										height="8"
+										src={user?.avatar ?? "/avatar.png"}
+										alt={user?.name ?? "Anonimo"}
+										className="h-8 w-8 rounded-lg"
+									/>
 									<div className="grid flex-1 text-left text-sm leading-tight">
 										<span className="truncate font-medium">{user?.name}</span>
 										<span className="truncate text-xs">{user?.email}</span>

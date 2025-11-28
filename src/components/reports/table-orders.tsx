@@ -3,7 +3,10 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip"
 import { useOrders } from "@/hooks/use-orders"
+import { cn } from "@/lib/utils"
+import { PAYMENT_METHODS, STATUS } from "@/types/order"
 import { Loader2, RotateCcw } from "lucide-react"
 
 export default function TableOrders() {
@@ -12,13 +15,20 @@ export default function TableOrders() {
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle className="text-2xl flex items-center justify-between">
+				<CardTitle className="text-xl flex items-center justify-between">
 					<span>Pedidos</span>
-					<Button variant="ghost" onClick={async () => await refetch()}>
-						{isRefetching ? <Loader2 className="animate-spin" /> : <RotateCcw className="scale-x-[-1]" />}
-					</Button>
+					<Tooltip>
+						<TooltipTrigger asChild>
+							<Button variant="ghost" onClick={async () => await refetch()}>
+								{isRefetching ? <Loader2 className="animate-spin" /> : <RotateCcw className="scale-x-[-1]" />}
+							</Button>
+						</TooltipTrigger>
+						<TooltipContent>
+							<p>Recargar</p>
+						</TooltipContent>
+					</Tooltip>
 				</CardTitle>
-				<CardDescription className="text-xs">Los 15 ultimos pedidos creados.</CardDescription>
+				<CardDescription className="text-xs">Los 15 últimos pedidos creados.</CardDescription>
 			</CardHeader>
 			<CardContent>
 				<Table>
@@ -34,11 +44,30 @@ export default function TableOrders() {
 						{data?.data?.result?.map(({ _id, name, phone, status, payment_method }) => (
 							<TableRow key={_id}>
 								<TableCell className="font-medium">{name}</TableCell>
-								<TableCell>{status}</TableCell>
 								<TableCell>
-									<Badge variant="outline" className="gap-1.5">
-										<span className="size-1.5 rounded-full bg-emerald-500" aria-hidden="true"></span>
-										{payment_method}
+									<Badge
+										className={cn("rounded-full border-none focus-visible:outline-none", {
+											"dark:bg-green-400/10 dark:text-green-400 dark:focus-visible:ring-green-400/40 [a&]:hover:bg-green-600/5 dark:[a&]:hover:bg-green-400/5 bg-green-600/10 text-green-600 focus-visible:ring-green-600/20":
+												status === "delivered",
+											"dark:bg-orange-400/10 dark:text-orange-400 dark:focus-visible:ring-orange-400/40 [a&]:hover:bg-orange-600/5 dark:[a&]:hover:bg-orange-400/5 bg-orange-600/10 text-orange-600 focus-visible:ring-orange-600/20":
+												status === "on_hold",
+											"dark:bg-red-400/10 dark:text-red-400 dark:focus-visible:ring-red-400/40 [a&]:hover:bg-red-600/5 dark:[a&]:hover:bg-red-400/5 bg-red-600/10 text-red-600 focus-visible:ring-red-600/20":
+												status === "cancelled"
+										})}>
+										{STATUS[status]}
+									</Badge>
+								</TableCell>
+								<TableCell>
+									<Badge
+										className={cn("rounded-full border-none focus-visible:outline-none", {
+											"dark:bg-green-400/10 dark:text-green-400 dark:focus-visible:ring-green-400/40 [a&]:hover:bg-green-600/5 dark:[a&]:hover:bg-green-400/5 bg-green-600/10 text-green-600 focus-visible:ring-green-600/20":
+												payment_method === "cash",
+											"dark:bg-blue-400/10 dark:text-blue-400 dark:focus-visible:ring-blue-400/40 [a&]:hover:bg-blue-600/5 dark:[a&]:hover:bg-blue-400/5 bg-blue-600/10 text-blue-600 focus-visible:ring-blue-600/20":
+												payment_method === "mercado_pago",
+											"dark:bg-neutral-400/10 dark:text-neutral-400 dark:focus-visible:ring-neutral-400/40 [a&]:hover:bg-neutral-600/5 dark:[a&]:hover:bg-neutral-400/5 bg-neutral-600/10 text-neutral-600 focus-visible:ring-neutral-600/20":
+												payment_method === "transfer"
+										})}>
+										{PAYMENT_METHODS[payment_method]}
 									</Badge>
 								</TableCell>
 								<TableCell>{phone ?? "-"}</TableCell>

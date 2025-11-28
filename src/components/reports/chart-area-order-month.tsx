@@ -1,43 +1,52 @@
 "use client"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { type ChartConfig, ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from "@/components/ui/empty"
 import { useReportMonth } from "@/hooks/use-reports"
 import { MONTH } from "@/lib/utils"
-import { ChartNoAxesCombined, Loader2, RotateCcw } from "lucide-react"
+import { ChartNoAxesCombined, Loader2, TrendingDown, TrendingUp } from "lucide-react"
+import { useMemo } from "react"
 import { Area, AreaChart, CartesianGrid, XAxis } from "recharts"
-import { Button } from "../ui/button"
 
 const chartConfig = {
-	desktop: { label: "Pedidos", color: "var(--chart-1)" }
+	desktop: { label: "Pedidos", color: "var(--chart-3)" }
 } satisfies ChartConfig
 
 export default function ChartAreaOrderMonth() {
-	const { data, isLoading, refetch, isRefetching } = useReportMonth()
+	const { data, isLoading, isFetching } = useReportMonth()
 
-	const chartData = data?.data?.map(({ month, count }) => ({ month: MONTH[parseInt(month) - 1], desktop: count }))
+	const chartData =
+		data?.data?.map(({ month, quantity, total }) => ({
+			month: MONTH[parseInt(month) - 1],
+			desktop: quantity,
+			total
+		})) ?? []
+
+	const trend = useMemo(() => {
+		if (!chartData) return null
+		if (chartData.length < 2) return null
+		const last = chartData[chartData.length - 1].total
+		const prev = chartData[chartData.length - 2].total
+		const variation = ((last - prev) / prev) * 100
+		return Number(variation.toFixed(2))
+	}, [chartData])
 
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle className="text-2xl flex items-center justify-between">
-					<span>Estadísticas</span>
-					<Button variant="ghost" onClick={async () => await refetch()}>
-						{isRefetching ? <Loader2 className="animate-spin" /> : <RotateCcw className="scale-x-[-1]" />}
-					</Button>
-				</CardTitle>
-				<CardDescription className="text-xs">Resumen de los pedidos realizados en los ultimos 6 meses.</CardDescription>
+				<CardTitle className="text-xl">Pedidos</CardTitle>
+				<CardDescription className="text-sm">Resumen de pedidos realizados en los últimos 6 meses.</CardDescription>
 			</CardHeader>
 			<CardContent>
 				{isLoading ||
-					(isRefetching && (
+					(isFetching && (
 						<div className="flex h-[150px] items-center justify-center">
 							<Loader2 className="animate-spin" />
 						</div>
 					))}
-				{chartData && !isLoading && !isRefetching && (
+				{chartData.length > 1 && !isLoading && !isFetching && (
 					<ChartContainer config={chartConfig}>
-						<AreaChart accessibilityLayer data={chartData} margin={{ left: 12, right: 12 }}>
+						<AreaChart accessibilityLayer data={chartData} margin={{ top: 12, left: 12, right: 12 }}>
 							<CartesianGrid vertical={false} />
 							<XAxis
 								dataKey="month"
@@ -57,7 +66,7 @@ export default function ChartAreaOrderMonth() {
 						</AreaChart>
 					</ChartContainer>
 				)}
-				{chartData?.length === 0 && !isLoading && !isRefetching && (
+				{chartData.length <= 1 && !isLoading && !isFetching && (
 					<Empty>
 						<EmptyHeader>
 							<EmptyMedia variant="icon">
@@ -71,6 +80,26 @@ export default function ChartAreaOrderMonth() {
 					</Empty>
 				)}
 			</CardContent>
+			{trend && (
+				<CardFooter className="flex-col items-start gap-2 text-sm">
+					<div className="flex gap-2 leading-none font-medium">
+						{trend > 0 ? (
+							<>
+								<span>Tendencia al alza del {trend} este mes</span>
+								<TrendingUp className="text-green-500 size-4" />
+							</>
+						) : (
+							<>
+								<span>Tendencia a la baja del {Math.abs(trend)}% este mes</span>
+								<TrendingDown className="text-red-500 size-4" />
+							</>
+						)}
+					</div>
+					<div className="text-muted-foreground leading-none text-xs">
+						Mostrando el total de pedidos en los últimos {chartData?.length ?? 6} meses.
+					</div>
+				</CardFooter>
+			)}
 		</Card>
 	)
 }
